@@ -18,3 +18,14 @@ target 'Pock' do
   pod 'Zip'
 
 end
+
+# Raise ancient pod deployment targets to Pock's minimum (silences Xcode warnings)
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      if Gem::Version.new(config.build_settings['MACOSX_DEPLOYMENT_TARGET'] || '0') < Gem::Version.new('10.15')
+        config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '10.15'
+      end
+    end
+  end
+end
