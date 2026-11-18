@@ -17,7 +17,7 @@ xcodebuild -workspace Pock.xcworkspace -scheme Pock -configuration Debug build
 
 - `PockKit` is pulled from `git@github.com:pock/pockkit.git` (SSH). If `pod install` fails on auth, switch that URL to HTTPS in the `Podfile`.
 - Schemes: `Pock` (main app), `QLPockWidget` (Quick Look extension), `Relaunch` (helper tool).
-- **The Pock target has a build phase that runs `killall Pock` and copies the built app over `/Applications/Pock.app`.** Every successful build replaces the installed copy and kills the running instance.
+- **The `Pock` scheme has a Build post-action that runs `killall Pock` and replaces `/Applications/Pock.app` with the built app.** Every successful build kills the running instance. It must stay a scheme post-action (not a target build phase): build phases run before Xcode code-signs, and an unsigned copy fails with "Pock can't be opened".
 - A CocoaPods "Check Pods Manifest.lock" phase fails the build if Pods are out of sync — rerun `pod install`.
 - `Pock/Bundle/Secrets.plist` is referenced as a build resource but gitignored — a fresh clone must create it (an empty `<dict/>` plist is fine) or the build fails with "Build input file cannot be found". It only holds the AppCenter secret, read in non-DEBUG builds; AppCenter itself was retired by Microsoft in 2025.
 - The `Podfile` `post_install` hook bumps pods' deployment targets to 10.15; current Xcode rejects the old ones (Zip ships 10.9).
